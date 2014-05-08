@@ -1,5 +1,8 @@
 from kivy.uix.gridlayout import GridLayout
 
+from Board import Board
+from Instructions import Instructions
+
 from kivy.lang import Builder
 Builder.load_string('''
 <BaseOwnBoard>:

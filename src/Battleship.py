@@ -11,33 +11,80 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 
 from OwnBoard import BaseOwnBoard
 from Board import Board
-from Instructions import Instructions, Continue
+from Instructions import Instructions
+from BoardMe import BoardMe
 
 #Builder.load_file('Battleship.kv')	
 Builder.load_string('''
+<MenuScreen>:
+    Image: 
+    	source: '../img/index.jpg'
+
+    AnchorLayout:
+		anchor_x: 'right'
+		anchor_y: 'bottom'
+		Button:
+			text: 'Play'
+			size_hint_x: 0.20
+			size_hint_y: 0.10
+			on_press: root.manager.current = 'ownBoard'
+
+	AnchorLayout:
+		anchor_x: 'left'
+		anchor_y: 'bottom'
+		Button:
+			text: 'Settings'
+			size_hint_x: 0.20
+			size_hint_y: 0.10
+			on_press: root.manager.current = 'ownBoard'
+
+
+<OwnBoardScreen>:
+	AnchorLayout:
+		anchor_x: 'right'
+		anchor_y: 'bottom'
+		Button:
+			id: 'continueButton'
+			name: 'continueButton'
+			text: 'Continue'
+			size_hint_x: 0.40
+			size_hint_y: 0.20
+			on_press: root.manager.current = 'gameBoard'		
 
 ''')
 
+class MenuScreen(Screen):
+    pass
+
+class OwnBoardScreen(Screen):
+    pass
+
+class GameBoardScreen(Screen):
+	pass
+
+
+sm = ScreenManager()
+sm.add_widget(MenuScreen(name='menu'))
+
+own = OwnBoardScreen(name='ownBoard')
+base = BaseOwnBoard()
+board = Board()
+ins = board.instructions
+base.add_widget(board)
+base.add_widget(ins)
+own.add_widget(base)
+sm.add_widget(own)
+
+boardMe = GameBoardScreen(name='gameBoard')
+grid = GridLayout(cols=2)
+grid.add_widget(Board(name='player1'))
+grid.add_widget(BoardMe(name='player2'))
+boardMe.add_widget(grid)
+sm.add_widget(boardMe)
+
 class BattleshipApp(App):
 	def build(self):
-		# sm = ScreenManager(id= 'smID')
-		# sc = Screen(name='secondBoard')
-		
-
-		base = BaseOwnBoard()
-		base.add_widget(Board())
-		base.add_widget(Instructions())
-
-
-		# sc.add_widget(base)
-		
-
-		# sc2 = Screen(name='holascreen')
-		# sc2.add_widget(Label(text='hola screeennenene'))
-		# sm.add_widget(sc)
-		# sm.add_widget(sc2)
-
-		return base
+		return sm
 
 if __name__ == '__main__':
 	BattleshipApp().run()
