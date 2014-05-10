@@ -27,7 +27,7 @@ Builder.load_string('''
 			text: 'Play'
 			size_hint_x: 0.20
 			size_hint_y: 0.10
-			on_press: root.manager.current = 'ownBoard'
+			on_release: root.manager.current = 'ownBoard'
 
 	AnchorLayout:
 		anchor_x: 'left'
@@ -36,7 +36,7 @@ Builder.load_string('''
 			text: 'Settings'
 			size_hint_x: 0.20
 			size_hint_y: 0.10
-			on_press: root.manager.current = 'ownBoard'
+			on_release: root.manager.current = 'ownBoard'
 
 
 <OwnBoardScreen>:
@@ -49,7 +49,7 @@ Builder.load_string('''
 			text: 'Continue'
 			size_hint_x: 0.40
 			size_hint_y: 0.20
-			on_press: root.manager.current = 'gameBoard'		
+			on_release: root.manager.current = 'gameBoard'		
 
 ''')
 
@@ -67,7 +67,7 @@ sm = ScreenManager()
 sm.add_widget(MenuScreen(name='menu'))
 
 own = OwnBoardScreen(name='ownBoard')
-base = BaseOwnBoard()
+base = GridLayout(cols=2)
 board = Board()
 ins = board.instructions
 base.add_widget(board)

@@ -14,7 +14,6 @@ Builder.load_string('''
 	size_hint_x: 0.7	
 		
 ''')
-#on_press: root.manager.current = 'secondBoard'
 
 class Instructions(BoxLayout):
 	def __init__(self, **kwargs):
@@ -23,7 +22,6 @@ class Instructions(BoxLayout):
 		self.boardDicc = {}
 		self.getBoatIcons()
 		self.add_widget(BoxLayout())
-
 
 
 	# def getTexts(self):
@@ -62,6 +60,7 @@ class Instructions(BoxLayout):
 
 	# 		else:
 	# 			self.add_widget(Label(text=ins[i]))
+	
 	def getBoatIcons(self):
 
 		box14 = BoxLayout(id="box_1_4")
@@ -183,7 +182,3 @@ class Instructions(BoxLayout):
 		self.add_widget(box23)
 		self.add_widget(box32)
 		self.add_widget(box41)
-
-	#show when all boats are in the board
-
-		

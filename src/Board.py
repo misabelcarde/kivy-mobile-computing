@@ -3,6 +3,8 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 
 from Instructions import Instructions
+from OwnBoard import BaseOwnBoard
+from BoardFunctions import *
 
 from kivy.lang import Builder
 Builder.load_string(''' 
@@ -15,13 +17,13 @@ Builder.load_string('''
 
 class Board(GridLayout):
 	'''Generation of the board and functions for complete it'''
-
 	def __init__(self, **kwargs):
 		''''''
 		super(Board, self).__init__(**kwargs)
 		self.dicc = {}
 		self.generateBoard()
 		self.instructions = Instructions()
+		self.base = BaseOwnBoard()
 		
 	def generateBoard(self):
 		'''Generation of buttons and labels. Buttons are added to a dictionary where key:id and value:button'''
@@ -40,66 +42,196 @@ class Board(GridLayout):
 	
 	def putBoat(self, button):
 		'''Behaviour of board's cells (buttons)'''
-		idSplit = button.id.split("_")
-		row = int(idSplit[0])
-		col = int(idSplit[1])
-		up = str (row-1)+"_"+str(col)
-		down = str (row+1)+"_"+str(col)
-		right = str (row)+"_"+str(col+1)
-		left = str (row)+"_"+str(col-1)
-		upLeft = str (row-1)+"_"+str(col-1)
-		upRight = str (row-1)+"_"+str(col+1)
-		downLeft = str (row+1)+"_"+str(col-1)
-		downRight = str (row+1)+"_"+str(col+1)
-
-		boats41Ids = ["4_1_0", "4_1_1", "4_1_2", "4_1_3"]
-		boats32Ids = ["3_2_0_0", "3_2_0_1", "3_2_1_0", "3_2_1_1","3_2_2_0","3_2_2_1"]
-		boats23Ids = ["2_3_0_0","2_3_0_1","2_3_0_2","2_3_1_0","2_3_1_1","2_3_1_2"]
-		boats14Ids = ["1_4_0", "1_4_1", "1_4_2", "1_4_3"]
+		limits = getLimitingButtons(button)
+		boatsIds = getBoatsIds()
+		pos = getButtonPosition(button)
 
 		if button.background_color == [1,1,1,1]:
-			button.background_color = (1,0.65,0,1)
+			button.background_color = [1,0.65,0,1]
 			button.text = button.id
+			self.base.matrix[pos[0]][pos[1]] = 1
 
-			boats41Done = False
-			for boat41 in boats41Ids:
-				barco = self.instructions.boardDicc[boat41]
-				if barco.source == "../img/LightBlueCircle.png":
-					if (up in self.dicc) and (down in self.dicc) and (left in self.dicc) and (right in self.dicc) :
-						if (self.dicc[up].background_color != [1,0.65,0,1]) and (self.dicc[down].background_color != [1,0.65,0,1]) and (self.dicc[left].background_color != [1,0.65,0,1]) and (self.dicc[right].background_color != [1,0.65,0,1]):
-							barco.source = "../img/DarkBlueCircle.png"
-							self.instructions.boardDicc[boat41] = barco
-							break
-					elif (up not in self.dicc):
+			#EN PROCESO... CAMBIO DE IMAGENES AL SELECCIONAR:
+			
+			# changeDone=False
+			# if not changeDone: 
+			# 	for boat41 in boatsIds['41Ids']:
+			# 		barco = self.instructions.boardDicc[boat41]
+			# 		if barco.source == "../img/LightBlueCircle.png":
+			# 			if exixtsLimits(button, self.dicc, limits):
+			# 				if not colourUp(self.dicc, limits) and not colourDown(self.dicc, limits) and not colourLeft(self.dicc, limits) and not colourRight(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoUp(button, self.dicc, limits):
+			# 				if not colourDown(self.dicc, limits) and not colourLeft(self.dicc, limits) and not colourRight(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoDown(button, self.dicc, limits):
+			# 				if not colourUp(self.dicc, limits) and not colourLeft(self.dicc, limits) and not colourRight(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoLeft(button, self.dicc, limits):
+			# 				if not colourUp(self.dicc, limits) and not colourDown(self.dicc, limits) and not colourRight(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoRight(button, self.dicc, limits):
+			# 				if not colourUp(self.dicc, limits) and not colourDown(self.dicc, limits) and not colourLeft(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoUpLeft(button, self.dicc, limits):
+			# 				if not colourDown(self.dicc, limits) and not colourRight(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoUpRight(button, self.dicc, limits):
+			# 				if not colourDown(self.dicc, limits) and not colourLeft(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoDownLeft(button, self.dicc, limits):
+			# 				if not colourUp(self.dicc, limits) and not colourRight(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+			# 			elif exixtsLimitsNoDownRight(button, self.dicc, limits):
+			# 				if not colourUp(self.dicc, limits) and not colourLeft(self.dicc, limits):
+			# 					barco.source = "../img/DarkBlueCircle.png"
+			# 					changeDone = True
+			# 					break
+
+
+
+			# if not changeDone: 
+			# 	for boat32 in boatsIds['32Ids']:
+			# 		barcoLeft = self.instructions.boardDicc[boat32[0]]
+			# 		barcoRight = self.instructions.boardDicc[boat32[1]]
+			# 		if barcoLeft.source == "../img/LightBlueMidCircleLeft.png" and barcoRight.source == "../img/LightBlueMidCircleRight.png":
+
+			# 			if exixtsLimits(button, self.dicc, limits):
+			# 				if noColourLimitsLessUp(self.dicc, limits) and not colourLimitUp2(self.dicc, limits):
+			# 					barcoLeft.source = "../img/DarkBlueMidCircleLeft.png"
+			# 					barcoRight.source = "../img/DarkBlueMidCircleRight.png"
+			# 					changeDone = True
+			# 					break
+
+			# 				elif noColourLimitsLessDown(self.dicc, limits):
+			# 					if (self.dicc[limits['down2']].background_color != [1,0.65,0,1]):
+			# 						barcoLeft.source = "../img/DarkBlueMidCircleLeft.png"
+			# 						barcoRight.source = "../img/DarkBlueMidCircleRight.png"
+			# 						changeDone = True
+			# 						break
+
+			# 				elif noColourLimitsLessLeft(self.dicc, limits):
+			# 					if (self.dicc[limits['left2']].background_color != [1,0.65,0,1]):
+			# 						barcoLeft.source = "../img/DarkBlueMidCircleLeft.png"
+			# 						barcoRight.source = "../img/DarkBlueMidCircleRight.png"
+			# 						print("Izq")
+			# 						changeDone = True
+			# 						break
+
+			# 				elif noColourLimitsLessRight(self.dicc, limits):
+			# 					if (self.dicc[limits['right2']].background_color != [1,0.65,0,1]):
+			# 						barcoLeft.source = "../img/DarkBlueMidCircleLeft.png"
+			# 						barcoRight.source = "../img/DarkBlueMidCircleRight.png"
+			# 						print("derecha")
+			# 						changeDone = True
+			# 						break
+
+
+			# 	for boat41 in boatsIds['41Ids']:
+			# 		barco = self.instructions.boardDicc[boat41]
+			# 		if barco.source == "../img/DarkBlueCircle.png":
+			# 			if exixtsLimits(button, self.dicc, limits):
+			# 				if ((colourUp(self.dicc, limits) and not colourUp2(self.dicc, limits)) or (colourDown(self.dicc, limits) and not colourDown2(self.dicc, limits)) or (colourLeft(self.dicc, limits) and not colourLeft2(self.dicc, limits)) or (colourRight(self.dicc, limits) and not colourRight2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoUp(button, self.dicc, limits):
+			# 				if ((colourDown(self.dicc, limits) and not colourDown2(self.dicc, limits)) or (colourLeft(self.dicc, limits) and not colourLeft2(self.dicc, limits)) or (colourRight(self.dicc, limits) and not colourRight2(self.dicc, limits))):								
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoDown(button, self.dicc, limits):
+			# 				if ((colourUp(self.dicc, limits) and not colourUp2(self.dicc, limits)) or (colourLeft(self.dicc, limits) and not colourLeft2(self.dicc, limits)) or (colourRight(self.dicc, limits) and not colourRight2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoLeft(button, self.dicc, limits):
+			# 				if ((colourUp(self.dicc, limits) and not colourUp2(self.dicc, limits)) or (colourDown(self.dicc, limits) and not colourDown2(self.dicc, limits)) or (colourRight(self.dicc, limits) and not colourRight2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoRight(button, self.dicc, limits):
+			# 				if ((colourUp(self.dicc, limits) and not colourUp2(self.dicc, limits)) or (colourDown(self.dicc, limits) and not colourDown2(self.dicc, limits)) or (colourLeft(self.dicc, limits) and not colourLeft2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoUpLeft(button, self.dicc, limits):
+			# 				if ((colourDown(self.dicc, limits) and not colourDown2(self.dicc, limits)) or (colourRight(self.dicc, limits) and not colourRight2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoUpRight(button, self.dicc, limits):
+			# 				if ((colourDown(self.dicc, limits) and not colourDown2(self.dicc, limits)) or (colourLeft(self.dicc, limits) and not colourLeft2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoDownLeft(button, self.dicc, limits):
+			# 				if ((colourUp(self.dicc, limits) and not colourUp2(self.dicc, limits)) or (colourRight(self.dicc, limits) and not colourRight2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break
+			# 			elif exixtsLimitsNoDownRight(button, self.dicc, limits):
+			# 				if ((colourUp(self.dicc, limits) and not colourUp2(self.dicc, limits)) or (colourLeft(self.dicc, limits) and not colourLeft2(self.dicc, limits))):
+			# 					barco.source = "../img/LightBlueCircle.png"
+			# 					break			
+
+
+
+
 						
-						barco.source = "../img/DarkBlueCircle.png"
-						self.instructions.boardDicc[boat41] = barco
-						break
-				else:
-					boats41Done = True
 
-			if(upLeft in self.dicc):
-				buttonUpLeft = self.dicc[upLeft]
+
+
+			
+
+
+
+
+			if(limits['upLeft'] in self.dicc):
+				buttonUpLeft = self.dicc[limits['upLeft']]
 				buttonUpLeft.disabled = True
-				self.dicc[upLeft] = buttonUpLeft
 
-			if(upRight in self.dicc):
-				buttonUpRight = self.dicc[upRight]
+			if(limits['upRight'] in self.dicc):
+				buttonUpRight = self.dicc[limits['upRight']]
 				buttonUpRight.disabled = True
-				self.dicc[upRight] = buttonUpRight
 
-			if(downLeft in self.dicc):
-				buttonDownLeft = self.dicc[downLeft]
+			if(limits['downLeft'] in self.dicc):
+				buttonDownLeft = self.dicc[limits['downLeft']]
 				buttonDownLeft.disabled = True
-				self.dicc[downLeft] = buttonDownLeft
 
-			if(downRight in self.dicc):
-				buttonDownRight = self.dicc[downRight]
+			if(limits['downRight'] in self.dicc):
+				buttonDownRight = self.dicc[limits['downRight']]
 				buttonDownRight.disabled = True
-				self.dicc[downRight] = buttonDownRight
+
 
 		else:
 
-			button.background_color = (1,1,1,1)
+			button.background_color = [1,1,1,1]
+			self.base.matrix[pos[0]][pos[1]] = 0
+
+
+			if(limits['upLeft'] in self.dicc):
+				buttonUpLeft = self.dicc[limits['upLeft']]
+				buttonUpLeft.disabled = False
+
+			if(limits['upRight'] in self.dicc):
+				buttonUpRight = self.dicc[limits['upRight']]
+				buttonUpRight.disabled = False
+
+			if(limits['downLeft'] in self.dicc):
+				buttonDownLeft = self.dicc[limits['downLeft']]
+				buttonDownLeft.disabled = False
+
+			if(limits['downRight'] in self.dicc):
+				buttonDownRight = self.dicc[limits['downRight']]
+				buttonDownRight.disabled = False
 
 	
