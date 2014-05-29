@@ -190,3 +190,9 @@ def noColourLimitsLessRight(dicc, limits):
 
 def colourLimitUp2(dicc, limits):
 	return (dicc[limits['up2']].background_color == [1,0.65,0,1])
+
+
+
+
+def generateRandomGame():
+	pass

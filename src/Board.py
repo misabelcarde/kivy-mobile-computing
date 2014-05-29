@@ -1,8 +1,9 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-
+from Singleton import *
 from Instructions import Instructions
+from Winner import *
 from OwnBoard import BaseOwnBoard
 from BoardFunctions import *
 
@@ -23,7 +24,8 @@ class Board(GridLayout):
 		self.dicc = {}
 		self.generateBoard()
 		self.instructions = Instructions()
-		self.base = BaseOwnBoard()
+		self.winner = Winner()
+		self.base = Singleton()
 		
 	def generateBoard(self):
 		'''Generation of buttons and labels. Buttons are added to a dictionary where key:id and value:button'''
@@ -35,7 +37,7 @@ class Board(GridLayout):
 		for j in range(0,len(letters)):
 		 	self.add_widget(Label(text=letters[j]))
 		 	for k in range(0,10):
-		 		button=Button(id=(str(j)+'_'+str(k)),background_color=(1,1,1,1))
+		 		button=Button(id=(str(j)+'_'+str(k)),background_color=(0,2,255,1))
 		 		button.bind(on_press=self.putBoat)
 		 		self.add_widget(button)
 		 		self.dicc[str(j)+'_'+str(k)]=button
@@ -45,10 +47,9 @@ class Board(GridLayout):
 		limits = getLimitingButtons(button)
 		boatsIds = getBoatsIds()
 		pos = getButtonPosition(button)
-
-		if button.background_color == [1,1,1,1]:
-			button.background_color = [1,0.65,0,1]
-			button.text = button.id
+		if button.background_color == [0,2,255,1]:
+			button.background_color = [0,1,0,1]
+			#button.text = button.id
 			self.base.matrix[pos[0]][pos[1]] = 1
 
 			#EN PROCESO... CAMBIO DE IMAGENES AL SELECCIONAR:
@@ -214,24 +215,36 @@ class Board(GridLayout):
 
 		else:
 
-			button.background_color = [1,1,1,1]
+			button.background_color = [0,2,255,1]
 			self.base.matrix[pos[0]][pos[1]] = 0
 
 
 			if(limits['upLeft'] in self.dicc):
 				buttonUpLeft = self.dicc[limits['upLeft']]
+				# posUpLeft = getButtonPosition(buttonUpLeft)
+				# self.base.matrix[posUpLeft[0]][posUpLeft[1]] = 0
+				# buttonUpLeft.background_color = [1,1,1,1]
 				buttonUpLeft.disabled = False
 
 			if(limits['upRight'] in self.dicc):
 				buttonUpRight = self.dicc[limits['upRight']]
+				# posUpRight = getButtonPosition(buttonUpRight)
+				# self.base.matrix[posUpRight[0]][posUpRight[1]] = 0
+				# buttonUpRight.background_color = [1,1,1,1]
 				buttonUpRight.disabled = False
 
 			if(limits['downLeft'] in self.dicc):
 				buttonDownLeft = self.dicc[limits['downLeft']]
+				# posDownLeft = getButtonPosition(buttonDownLeft)
+				# self.base.matrix[posDownLeft[0]][posDownLeft[1]] = 0
+				# buttonDownLeft.background_color = [1,1,1,1]
 				buttonDownLeft.disabled = False
 
 			if(limits['downRight'] in self.dicc):
 				buttonDownRight = self.dicc[limits['downRight']]
+				# posDownRight = getButtonPosition(buttonDownRight)
+				# self.base.matrix[posDownRight[0]][posDownRight[1]] = 0
+				# buttonDownRight.background_color = [1,1,1,1]
 				buttonDownRight.disabled = False
 
 	
