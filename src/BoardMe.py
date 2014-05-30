@@ -44,16 +44,5 @@ class BoardMe(GridLayout):
 					button.background_color=[6,0,0,1]
 				elif matrix[j][k] == -1:
 					button.text ='·' 
-					button.font_size = 50
-
-		#for x in range(0,10):
-		#	for y in range(0,10):
-		#		if self.base.matrix[x][y] == 1:
-		#			 button.background_color=[0,0,0,1]
-	
-	#def postShip(button):
-		
-
-
-			 		
+					button.font_size = 50 		
 	

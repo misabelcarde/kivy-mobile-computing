@@ -10,6 +10,7 @@ class Singleton(object):
     aux = 0
     aux2 = 0
     winner = 0
+    opponentIP = 'HOLA ISA'
     msg = None
     def __new__(cls, *args, **kwargs):
         if not cls._instance:

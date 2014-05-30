@@ -9,6 +9,8 @@ from kivy.uix.scatter import Scatter
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.switch import Switch
+from kivy.core.audio import SoundLoader
+from kivy.uix.textinput import TextInput
 from Singleton import *
 from OwnBoard import BaseOwnBoard
 from Board import Board
@@ -18,81 +20,10 @@ from BoardMe import BoardMe
 from BoardPlay import *
 from BoardPlay2 import *
 from Board2 import *
-from Vacio	import *
-from kivy.core.audio import SoundLoader
+from SendPackage import *
+import socket
 
-Builder.load_string('''
-<MenuScreen>:
-    Image: 
-    	source: '../img/background_index.png'
-
-    AnchorLayout:
-		anchor_x: 'center'
-		anchor_y: 'bottom'
-		Button:
-			background_normal: '../img/two_players.png'
-			background_down: '../img/two_players_down.png'
-			size_hint: (0.30, 0.16)
-			on_release: root.manager.current = 'PreOwnBoardScreen'			
- 
-	AnchorLayout:
-		anchor_x: 'right'
-		anchor_y: 'bottom'
-		Button:
-			background_normal: '../img/online.png'
-			background_down: '../img/online_down.png'
-			size_hint: (0.30, 0.16)
-			on_release: root.manager.current = 'OwnBoardScreen'
-
-	AnchorLayout:
-		anchor_x: 'left'
-		anchor_y: 'bottom'
-		Button:
-			background_normal: '../img/settings.png'
-			background_down: '../img/settings_down.png'
-			size_hint: (0.25, 0.16)
-			on_release: root.manager.current = 'SettingsScreen'
-
-
-<OwnBoardScreen>:
-	Image: 
-    	source: '../img/background_wood.png'
-	AnchorLayout:
-		anchor_x: 'right'
-		anchor_y: 'bottom'
-		Button:
-			#name: 'continueButton'
-			background_normal: '../img/play.png'
-			background_down: '../img/play_down.png'
-			size_hint: (0.40,0.20)
-			on_release: root.choose_next_screen()
-
-<PreOwnBoardScreen>:
-	Image: 
-    	source: '../img/background_wood.png'
-	AnchorLayout:
-		anchor_x: 'right'
-		anchor_y: 'bottom'
-		Button:
-			#name: 'continueButton'
-			background_normal: '../img/player2.png'
-			background_down: '../img/player2_down.png'
-			size_hint: (0.40,0.20)
-			on_release: root.manager.current = 'OwnBoardScreen'
-			
-<GameBoardScreen>:
-	Image: 
-	    source: '../img/background_wood.png'
-
-<GameBoardScreen2>:
-	Image: 
-	    source: '../img/background_wood.png'
-
-<SettingsScreen>:
-	Image: 
-	    source: '../img/background_wood.png'
-
-''')
+Builder.load_file('Battleship.kv')	
 
 
 sound = SoundLoader.load('../sound/pirata.wav')
@@ -102,16 +33,11 @@ sound2.loop = True
 
 class MenuScreen(Screen):
 	pass
-# class PlayerOnlineScreen(Screen):
-# 	def ip1(self,instance):
-# 		Singleton().ip1 = True
+class PlayerOnlineScreen(Screen):
+	def saveIP(self):
+		Singleton().opponentIP = self.ids.ipText.text
+		self.manager.current = 'OwnBoardScreen'
 		
-# 	def ip2(self,instance):
-# 		Singleton().ip2 = True
-# 		#self.manager.current = 'OwnBoardScreen'
-# 	def next_screen(self,instance):
-# 		self.manager.current = 'OwnBoardScreen'
-
 
 class SettingsScreen(Screen):
 
@@ -127,13 +53,16 @@ class SettingsScreen(Screen):
 			sound.play()
 			sound2.play()
 
+
 class OwnBoardScreen(Screen):
     def choose_next_screen(self):
     	sound.stop()
     	if(Singleton().mode == 'TwoPlayers'):
         	self.manager.current = 'gameBoard2'
     	else:
+        	send(Singleton().opponentIP , '1,'+str(Singleton().matrix))
         	self.manager.current = 'gameBoard'
+
 
 class PreOwnBoardScreen(Screen):
 	def __init__(self, **kwargs):
@@ -142,6 +71,7 @@ class PreOwnBoardScreen(Screen):
 
 	def on_pre_enter(self):
 		Singleton().mode = 'TwoPlayers'
+
 
 class GameBoardScreen(Screen):
 	def __init__(self, **kwargs):
@@ -154,10 +84,10 @@ class GameBoardScreen(Screen):
 
 		Singleton().gameboard.add_widget(Image(source='../img/background_wood.png'))
 		grid = GridLayout(cols=2,rows=2)
-		grid.add_widget(Label(text='[color=fc9701]Player[/color]',markup = True, font_size=26, size_hint_y=0.05))
 		grid.add_widget(Label(text='[color=fc9701]Opponent[/color]',markup = True, font_size=26, size_hint_y=0.05))
-		grid.add_widget(BoardPlay(name='player1'))
-		grid.add_widget(BoardMe(name='player2'))
+		grid.add_widget(Label(text='[color=fc9701]My board[/color]',markup = True, font_size=26, size_hint_y=0.05))
+		grid.add_widget(BoardPlay(name='opponent'))
+		grid.add_widget(BoardMe(name='myBoard'))
 		Singleton().gameboard.add_widget(grid)
 		
 class GameBoardScreen2(Screen):
@@ -191,9 +121,6 @@ class BattleshipApp(App):
 	def build(self):
 		sm = ScreenManager()
 		sm.add_widget(MenuScreen(name='menu'))
-
-		mp = MenuScreen(name='menuScreen')
-		sm.add_widget(mp)
 
 		ownBoardScreen = OwnBoardScreen(name='OwnBoardScreen')
 		base = GridLayout(cols=2)
@@ -238,26 +165,9 @@ class BattleshipApp(App):
 		settingsScreen.add_widget(anchor)
 		sm.add_widget(settingsScreen)	
 
-		# playerOnlineScreen = PlayerOnlineScreen(name='PlayerOnlineScreen')
-		# anchor1 = AnchorLayout(anchor_x='right', anchor_y='bottom')
-		# oneButton = Button(background_normal= '../img/menu.png', background_down= '../img/menu2.png',size_hint=(0.4,0.2))
-		# oneButton.bind(on_press= playerOnlineScreen.ip1)
-		# anchor2 = AnchorLayout(anchor_x='left', anchor_y='bottom')
-		# twoButton = Button(text='2',size_hint=(0.4,0.2))#background_normal= '../img/menu.png', background_down= '../img/menu2.png',size_hint=(0.4,0.2))
-		# twoButton.bind(on_press= playerOnlineScreen.ip2)
-		# anchor3 = AnchorLayout(anchor_x='center', anchor_y='bottom')
-		# threeButton = Button(text='Tablero',size_hint=(0.4,0.2))
-		# threeButton.bind(on_press=playerOnlineScreen.next_screen)
-		# anchor1.add_widget(oneButton)
-		# anchor2.add_widget(twoButton)
-		# anchor3.add_widget(threeButton)
-		# playerOnlineGrid = GridLayout(cols=6)
+		playerOnlineScreen = PlayerOnlineScreen(name='PlayerOnlineScreen')
 
-		# playerOnlineScreen.add_widget(playerOnlineGrid)
-		# playerOnlineScreen.add_widget(anchor1)
-		# playerOnlineScreen.add_widget(anchor2)
-		# playerOnlineScreen.add_widget(anchor3)
-		# sm.add_widget(playerOnlineScreen)
+		sm.add_widget(playerOnlineScreen)
 
 
 

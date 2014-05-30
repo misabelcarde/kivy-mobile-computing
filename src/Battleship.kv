@@ -1,0 +1,110 @@
+#:import socket socket
+<MenuScreen>:
+    Image: 
+    	source: '../img/background_index.png'
+
+    AnchorLayout:
+		anchor_x: 'center'
+		anchor_y: 'bottom'
+		Button:
+			background_normal: '../img/two_players.png'
+			background_down: '../img/two_players_down.png'
+			size_hint: (0.30, 0.16)
+			on_release: root.manager.current = 'PreOwnBoardScreen'			
+ 
+	AnchorLayout:
+		anchor_x: 'right'
+		anchor_y: 'bottom'
+		Button:
+			background_normal: '../img/online.png'
+			background_down: '../img/online_down.png'
+			size_hint: (0.30, 0.16)
+			on_release: root.manager.current = 'PlayerOnlineScreen'
+
+	AnchorLayout:
+		anchor_x: 'left'
+		anchor_y: 'bottom'
+		Button:
+			background_normal: '../img/settings.png'
+			background_down: '../img/settings_down.png'
+			size_hint: (0.25, 0.16)
+			on_release: root.manager.current = 'SettingsScreen'
+
+
+<SettingsScreen>:
+	Image: 
+	    source: '../img/background_wood.png'
+	    
+
+<PreOwnBoardScreen>:
+	Image: 
+    	source: '../img/background_wood.png'
+	AnchorLayout:
+		anchor_x: 'right'
+		anchor_y: 'bottom'
+		Button:
+			#name: 'continueButton'
+			background_normal: '../img/player2.png'
+			background_down: '../img/player2_down.png'
+			size_hint: (0.40,0.20)
+			on_release: root.manager.current = 'OwnBoardScreen'
+
+<PlayerOnlineScreen>:
+	Image:
+		source: '../img/background_wood.png'
+	GridLayout:
+		rows:3
+		Label:
+			text:"[color=fc9701]\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nYour IP is: "+str(socket.gethostbyname(socket.gethostname()))+"[/color]"
+			markup:True
+			font_size:26
+			size_hint_y:0.05
+		GridLayout:
+			cols:2
+			size_hint_y:0.08
+			Label:
+				text:'[color=fc9701]Your opponent IP is: [/color]'
+				markup:True
+				font_size:26
+				size_hint_y:0.05
+			TextInput:
+				id:ipText
+				text:'192.168.1.20'
+				font_size:26
+				focus:True
+				multiline:False
+		AnchorLayout:
+			anchor_x: 'right'
+			anchor_y: 'bottom'
+			Button:
+				id:ipButton
+				background_normal: '../img/player2.png'
+				background_down: '../img/player2_down.png'
+				size_hint: (0.40,0.20)
+				on_press: root.saveIP()
+				on_release: root.manager.current = 'OwnBoardScreen'
+
+
+
+<OwnBoardScreen>:
+	Image: 
+    	source: '../img/background_wood.png'
+	AnchorLayout:
+		anchor_x: 'right'
+		anchor_y: 'bottom'
+		Button:
+			#name: 'continueButton'
+			background_normal: '../img/play.png'
+			background_down: '../img/play_down.png'
+			size_hint: (0.40,0.20)
+			on_release: root.choose_next_screen()
+
+
+<GameBoardScreen>:
+	Image: 
+	    source: '../img/background_wood.png'
+
+
+<GameBoardScreen2>:
+	Image: 
+	    source: '../img/background_wood.png'
